@@ -1,0 +1,26 @@
+---
+title: "Precis"
+author: "Richard Ryan"
+date: "11/15/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+compare <- read.csv("fandango_score_comparison.csv")
+scrape <- read.csv("fandango_scrape.csv")
+```
+
+
+```{r}
+#Precis: The "fandango_score_comparison.csv" dataset contains every film that has a Rotten Tomatoes rating, a RT User rating, a Metacritic score, a Metacritic User score, and IMDb score, and at least 30 fan reviews on Fandango. The data from Fandango was pulled on Aug. 24, 2015. The "fandango_scrape.csv" dataset contains every film that was pulled from Fandango. I will use this data to perform analyses on movie ratings from various sources. I may possibly do analyses that compare user and critic ratings among various ratings sources.
+
+
+#Summary Statistics:
+summary(scrape)
+summary(compare)
+
+movie_ratings <- left_join(compare, scrape, by = "FILM")
+```
