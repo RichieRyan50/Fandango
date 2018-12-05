@@ -1,0 +1,24 @@
+---
+title: "Workbook"
+author: "Richard Ryan"
+date: "12/4/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+
+compare <- read.csv("fandango_score_comparison.csv")
+scrape <- read.csv("fandango_scrape.csv")
+```
+
+
+```{r joining data}
+#Left_joining compare and scrape data by "FILM" to make one data set
+movie_ratings <- left_join(compare, scrape, by = "FILM")
+
+View(movie_ratings)
+```
+
