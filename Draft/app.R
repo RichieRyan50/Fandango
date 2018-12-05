@@ -21,19 +21,21 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                     sidebarLayout(
                                       sidebarPanel(
                                         selectInput("x_axis",
-                                                    "Movie Rating Sites' Scores",
+                                                    "Movie Rating Sites' Scores (x-axis)",
                                                     choices = c("Rotten Tomatoes" = "RT_norm", 
                                                                 "Metacritic" = "Metacritic_norm", 
-                                                                "IMDB" = "IMDB_norm")), 
+                                                                "IMDB" = "IMDB_norm", 
+                                                                "Fandango" = "Fandango_Ratingvalue")), 
                                         tags$h6(helpText("These film scores have been normalized to a 0 to 5 point system")), 
                                         
                                         br(),
                                         
                                         selectInput("y_axis", 
-                                                    "Movie Rating Sites' Scores", 
+                                                    "Movie Rating Sites' Scores (y-axis)", 
                                                     choices = c("Rotten Tomatoes" = "RT_norm", 
                                                                 "Metacritic" = "Metacritic_norm", 
-                                                                "IMDB" = "IMDB_norm")), 
+                                                                "IMDB" = "IMDB_norm",
+                                                                "Fandango" = "Fandango_Ratingvalue")), 
                                         tags$h6(helpText("These film scores have been normalized to a 0 to 5 point system")) 
                                         
                                       ),
@@ -60,6 +62,8 @@ server <- function(input, output) {
       x_label <- "Metacritic"
     } else if(input$x_axis == "IMDB_norm"){
       x_label <- "IMDB"
+    } else if(input$x_axis == "Fandango_Ratingvalue"){
+      x_label <- "Fandango"
     }})
   
   y_label <- reactive({
@@ -68,8 +72,10 @@ server <- function(input, output) {
       y_label <- "RottenTomatoes"
     } else if(input$y_axis == "Metacritic_norm"){
       y_label <- "Metacritic"
-    } else if(input$x_axis == "IMDB_norm"){
+    } else if(input$y_axis == "IMDB_norm"){
       y_label <- "IMDB"
+    } else if(input$y_axis == "Fandango_Ratingvalue"){
+      y_label == "Fandango"
     }})
   
   
@@ -85,7 +91,7 @@ server <- function(input, output) {
       labs(x = x_label(),
            y = y_label(),
            title = "Correlation of Movie Scores Among Popular Movie Rating Sites",
-           subtitle = "IMDB seems to show the weakest correlation when compared to the other sites",
+           subtitle = "Fandango seems to show the weakest and most erratic correlation when compared to the other sites",
            caption = "Data taken from FiveThirtyEight")
     
   })
