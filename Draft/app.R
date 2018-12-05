@@ -1,50 +1,93 @@
 library(shiny)
+library(haven)
+library(sjlabelled)
+library(rsconnect)
+library(shinythemes)
+library(knitr)
+library(scales)
+library(stargazer)
+library(ggrepel)
 library(tidyverse)
-
 
 compare <- read_csv("fandango_score_comparison.csv")
 scrape <- read_csv("fandango_scrape.csv")
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(
-  
-  # Application title
-  titlePanel("Movie Ratings on Fandango"),
-  
-  # Sidebar with a slider input for number of bins 
-  sidebarLayout(
-    sidebarPanel(
-      selectInput(inputId = "Fandango_Stars",
-                  label = "Fandango Stars:",
-                  choices = c(3.0,
-                              3.5,
-                              4.0,
-                              4.5,
-                              5.0))
-    ),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("fandstarPlot")
-    )
-  )
+
+ui <- fluidPage(theme = shinytheme("flatly"),
+                
+                navbarPage("Movie Rating Site Comparison",
+                           
+                           tabPanel("Graph",
+                                    sidebarLayout(
+                                      sidebarPanel(
+                                        selectInput("x_axis",
+                                                    "Movie Rating Sites' Scores",
+                                                    choices = c("Rotten Tomatoes" = "RT_norm", 
+                                                                "Metacritic" = "Metacritic_norm", 
+                                                                "IMDB" = "IMDB_norm")), 
+                                        tags$h6(helpText("These film scores have been normalized to a 0 to 5 point system")), 
+                                        
+                                        br(),
+                                        
+                                        selectInput("y_axis", 
+                                                    "Movie Rating Sites' Scores", 
+                                                    choices = c("Rotten Tomatoes" = "RT_norm", 
+                                                                "Metacritic" = "Metacritic_norm", 
+                                                                "IMDB" = "IMDB_norm")), 
+                                        tags$h6(helpText("These film scores have been normalized to a 0 to 5 point system")) 
+                                        
+                                      ),
+                                      
+                                      
+                                      mainPanel(
+                                        plotOutput("plot"),
+                                        htmlOutput("summary")
+                                      )
+                                    )
+                           )
+                )
 )
 
-# Define server logic required to draw a histogram
+
+
 server <- function(input, output) {
   
-  output$fandstarPlot <- renderPlot({
+  x_label <- reactive({
+    req(input$x_axis) 
+    if(input$x_axis == "RT_norm"){
+      x_label <- "RottenTomatoes"
+    } else if(input$x_axis == "Metacritic_norm"){
+      x_label <- "Metacritic"
+    } else if(input$x_axis == "IMDB_norm"){
+      x_label <- "IMDB"
+    }})
+  
+  y_label <- reactive({
+    req(input$y_axis) 
+    if(input$y_axis == "RT_norm"){
+      y_label <- "RottenTomatoes"
+    } else if(input$y_axis == "Metacritic_norm"){
+      y_label <- "Metacritic"
+    } else if(input$x_axis == "IMDB_norm"){
+      y_label <- "IMDB"
+    }})
+  
+  
+  output$plot <- renderPlot({
     
     movie_ratings <- left_join(compare, scrape, by = "FILM")
     
-    movie_ratings <- movie_ratings %>% 
-      filter(Fandango_Stars == input$Fandango_Stars)
     
     
-    ggplot(data = movie_ratings, aes(x = RATING)) + 
-      geom_histogram(na.rm = TRUE, stat = "count") + 
-      labs(x = "Fandango Absolute Rating", 
-           title = "Count of Films' Fandango Stars and Absolute Ratings")
+    movie_ratings %>% 
+      ggplot(aes_string(x = input$x_axis, y = input$y_axis)) + 
+      geom_point() +
+      labs(x = x_label(),
+           y = y_label(),
+           title = "Correlation of Movie Scores Among Popular Movie Rating Sites",
+           subtitle = "IMDB seems to show the weakest correlation when compared to the other sites",
+           caption = "Data taken from FiveThirtyEight")
+    
   })
 }
 
