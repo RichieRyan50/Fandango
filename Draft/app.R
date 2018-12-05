@@ -9,14 +9,15 @@ library(stargazer)
 library(ggrepel)
 library(tidyverse)
 
+#Reading in data
 compare <- read_csv("fandango_score_comparison.csv")
 scrape <- read_csv("fandango_scrape.csv")
 
-
+#Determining shinytheme
 ui <- fluidPage(theme = shinytheme("flatly"),
-                
+
+#Plugging in movie rating sites for x and y axes
                 navbarPage("Movie Rating Site Comparison",
-                           
                            tabPanel("Graph",
                                     sidebarLayout(
                                       sidebarPanel(
@@ -53,7 +54,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 
 
 server <- function(input, output) {
-  
+
+#Determing reactives for x and y axes inputs 
   x_label <- reactive({
     req(input$x_axis) 
     if(input$x_axis == "RT_norm"){
@@ -83,8 +85,7 @@ server <- function(input, output) {
     
     movie_ratings <- left_join(compare, scrape, by = "FILM")
     
-    
-    
+#Creating scatterplot of film ratings from sites
     movie_ratings %>% 
       ggplot(aes_string(x = input$x_axis, y = input$y_axis)) + 
       geom_point() +
@@ -97,6 +98,6 @@ server <- function(input, output) {
   })
 }
 
-# Run the application 
+#Run the application 
 shinyApp(ui = ui, server = server)
 
