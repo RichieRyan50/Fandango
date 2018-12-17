@@ -55,7 +55,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 
 server <- function(input, output) {
 
-#Determing reactives for x and y axes inputs 
+#Determining reactives for x and y axes inputs 
   x_label <- reactive({
     req(input$x_axis) 
     if(input$x_axis == "RT_norm"){
@@ -88,7 +88,8 @@ server <- function(input, output) {
 #Creating scatterplot of film ratings from sites
     movie_ratings %>% 
       ggplot(aes_string(x = input$x_axis, y = input$y_axis)) + 
-      geom_point() +
+      geom_point() + 
+      geom_smooth(method = "lm") + 
       labs(x = x_label(),
            y = y_label(),
            title = "Correlation of Movie Scores Among Popular Movie Rating Sites",
